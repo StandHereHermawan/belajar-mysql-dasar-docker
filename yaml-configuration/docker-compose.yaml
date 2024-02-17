@@ -1,0 +1,51 @@
+# Use root/example as user/password credentials
+version: '3.8'
+
+services:
+  db-mysql:
+    image: mysql:8.2.0-1.el8
+    container_name: db-mysql
+    ports:
+    # Long Syntax
+      - protocol: tcp
+        published: 3306
+        target: 3306
+    # Short Syntax
+    # - "3306:3306"
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.25"
+          memory: 500m
+        limits:
+          cpus: "2"
+          memory: 2g
+    environment:
+      MYSQL_ROOT_PASSWORD: root@example12
+      MYSQL_USER: ariefkarditya
+      MYSQL_PASSWORD: 12032003
+      MYSQL_DATABASE: test_database
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    # NOTE: use of "mysql_native_password" is not recommended:
+    # https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    # command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+    # Long Syntax
+      - type: volume
+        source: db-mysql
+        target: "/var/lib/mysql"
+        read_only: false
+    # Short Syntax
+    # - db-mysql:/var/lib/mysql
+    networks:
+      - dev-networks
+
+volumes:
+  db-mysql:
+    name: db-mysql
+
+networks:
+  dev-networks:
+    name: 17-02-24-networks
+    driver: bridge
