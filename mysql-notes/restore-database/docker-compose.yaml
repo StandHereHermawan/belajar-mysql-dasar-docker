@@ -1,0 +1,48 @@
+# Use root/example as user/password credentials
+version: '3.8'
+
+services:
+  test-restore-mysql:
+    image: mysql:8.2.0-1.el8
+    container_name: test-restore-mysql
+    ports:
+    # Long Syntax
+      - protocol: tcp
+        published: 3307
+        target: 3307
+    # Short Syntax
+    # - "3306:3306"
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.25"
+          memory: 500m
+        limits:
+          cpus: "2"
+          memory: 2g
+    environment:
+      MYSQL_ROOT_PASSWORD: 12032003
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    # NOTE: use of "mysql_native_password" is not recommended:
+    # https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    # command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+    # Long Syntax
+      - type: volume
+        source: mysql-test
+        target: "/var/lib/mysql"
+        read_only: false
+    # Short Syntax
+    # - db-mysql:/var/lib/mysql
+    networks:
+      - dev-test-networks
+
+volumes:
+  mysql-test:
+    name: mysql-test
+
+networks:
+  dev-test-networks:
+    name: network-test-17-03-24
+    driver: bridge
